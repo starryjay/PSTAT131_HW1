@@ -1,0 +1,89 @@
+---
+title: "PSTAT 131 HW 1"
+author: "Jay Shreedhar"
+date: '2022-04-02'
+output:
+    html_document:
+      code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<br /><br />
+**1.** Supervised learning is when we train our model with both predictor variables and a response variable. Unsupervised learning involves the model predicting an unknown response variable based on given predictor variables.<br /><br />
+**2.** A classification model has a categorical variable for its response, while a regression model has a quantitative variable for its response.<br /><br />
+**3.** ??<br /><br />
+**4.**<br />
+  
+|   Descriptive: We choose a model to best visually emphasize a trend in data, such as a line of best fit on a scatterplot.<br />
+|   Inferential: We choose a model that best allows us to test hypotheses, state a relationship between the outcome and predictors, and determine which features of the model/data are significant.<br />
+|   Predictive: We choose a model that allows us to determine which combination of features (predictors, etc.) fits the outcome best so that we can predict *Y* with minimum reducible error.<br /><br />
+**5.**<br />
+  
+|   Mechanistic: Assume a parametric form for *f*. This will NOT match the true unknown *f*. We can add parameters for more flexibility, but adding too many leads to overfitting. It is oversensitive to random noise in the training data, so with a new dataset it will not do well.<br />
+|   Empirically-driven: No assumptions about *f*. We require a larger number of observations. It is much more flexible by default, which means overfitting is easy.<br />
+|   These model types differ in that mechanistic models use a model to predict what will occur, while empirically-driven models use what has already occurred to build a model. They are similar in that both are susceptible to overfitting, meaning that their accuracy drops when using a dataset other than the training dataset.<br />
+|   Generally, mechanistic models are easier to understand, as I'm more familiar with those from PSTAT 126.<br />
+<br />
+**6.** The first question is predictive, while the second is inferential. This is because the first question uses data to predict *Y* (likelihood of voting in favor, in this case), while the second question attempts to test a theory of how *Y* would change given an additional predictor.<br /><br />
+<br /><br />
+**Exploratory Data Analysis**<br /><br />
+**Exercise 1:**<br />
+```{r, message=FALSE}
+
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+data(mpg)
+hist(mpg$hwy, col="turquoise")
+
+```
+  
+|   The majority of the data lies between 15 and 30 mpg, with a large amount between 25 and 30 mpg. The lowest value is 10 and the highest is 45. The mean is likely somewhere between 20 and 30 mpg.<br /><br />
+
+**Exercise 2:**<br /><br />
+```{r}
+
+plot(mpg$hwy, mpg$cty)
+
+```
+  
+|   The two variables seem to closely follow a line. There is probably a relationship between hwy and cty, and this logically makes sense - highway mpg and city mpg would probably increase at the same rate, as a vehicle's overall fuel economy would be better.<br /><br />
+
+**Exercise 3:**<br /><br />
+```{r}
+library(RColorBrewer)
+counts <- table(mpg$manufacturer)
+x <- names(counts)
+y <- as.numeric(counts)
+df <- data.frame(x, y)
+df <- arrange(df, y)
+ggplot(df, aes(x=reorder(x,y), y, fill = y)) + geom_col() + coord_flip()
+
+```
+  
+|   Dodge produced the most cars, while Lincoln produced the least.
+<br /><br />
+**Exercise 4:**<br /><br />
+```{r}
+
+bp <- ggplot(mpg, aes(group=cyl, x=hwy)) + geom_boxplot()
+bp
+
+```
+  
+|   It looks like as the number of cylinders increases, the highway mpg also increases.<br /><br />
+
+**Exercise 5:**<br /><br />
+```{r}
+
+library(corrplot)
+dat <- mpg %>%
+  select(-manufacturer, -model, -trans, -drv, -fl, -class)
+X <- cor(dat)
+corrplot(X, method = "number")
+
+```
+  
+|   Number of cylinders and engine displacement, as well as highway mpg and city mpg, are positively correlated. City mpg and engine displacement; number of cylinders and highway mpg; and number of cylinders and city mpg are all negatively correlated. These relationships generally make sense, although I'm confused about city mpg and engine displacement.
